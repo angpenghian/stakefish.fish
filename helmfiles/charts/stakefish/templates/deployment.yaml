@@ -1,0 +1,44 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-fastapi
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-fastapi
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-fastapi
+    spec:
+      containers:
+      - name: my-fastapi-app
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/usr/local/bin/uvicorn"]
+        args:
+          - "main:app"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "{{ .Values.service.port }}"
+          - "--reload"
+        env:
+          - name: DATABASE_URL
+            value: "{{ .Values.fastapi.db_url }}"
+        ports:
+        - name: fastapi-port
+          containerPort: {{ .Values.service.port }}
+        {{- if .Values.resources }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        {{- end }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Release.Name }}-configmap

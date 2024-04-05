@@ -1,0 +1,12 @@
+# values.yaml
+replicas: 1
+image:
+  repository: grafana/grafana
+  tag: 10.3.3
+service:
+  type: LoadBalancer
+  protocol: TCP
+  port: 80
+adminPassword: "stakefish"
+dashboardsConfigMaps:
+  default: "fastapi-dashboard"

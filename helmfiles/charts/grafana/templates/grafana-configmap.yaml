@@ -1,0 +1,36 @@
+# grafana-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource
+  namespace: default
+data:
+  datasources.yaml: |-
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus.default.svc.cluster.local
+        access: proxy
+        isDefault: true
+  dashboardproviders.yaml: |-
+    apiVersion: 1
+    providers:
+      - name: 'stakefish'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stakefish-dashboard
+  labels:
+    grafana_dashboard: "1"
+data:
+  stakefish.json: |-
+{{ .Files.Get "dashboards/stakefish.json" | indent 4 }}

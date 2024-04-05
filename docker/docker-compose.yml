@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  fastapi-test:
+    image: fastapi-test:latest
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: ""
