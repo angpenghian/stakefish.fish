@@ -4,8 +4,8 @@ on:
 
 jobs:
   build:
-    # runs-on: ubuntu-latest
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
+    # runs-on: [self-hosted, linux]
     steps:
       - name: Checkout source code 
         uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
       - name: Install Helm
         run: |
           curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-          chmod +x get_helm.sh
+          chmod 700 get_helm.sh
           ./get_helm.sh
 
       - name: Install helmfile
@@ -54,6 +54,9 @@ jobs:
           chmod +x helmfile
           sudo mv helmfile /usr/local/bin/
           helmfile --version
+
+      - name: Install helm diff plugin
+        run: helm plugin install https://github.com/databus23/helm-diff
 
       - name: Test kubectl configuration
         run: |
