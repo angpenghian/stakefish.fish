@@ -18,3 +18,8 @@ releases:
     chart: ../../charts/prometheus
     values:
       - ../../charts/prometheus/values.yaml
+
+  - name: grafana
+    chart: ../../charts/grafana
+    values:
+      - ../../charts/grafana/values.yaml
