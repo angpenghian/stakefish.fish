@@ -46,7 +46,7 @@ jobs:
           curl -L https://github.com/helmfile/helmfile/releases/download/v0.163.1/helmfile_0.163.1_linux_amd64.tar.gz -o helmfile.tar.gz
           tar -zxvf helmfile.tar.gz
           chmod +x helmfile
-          mv helmfile /usr/local/bin/
+          sudo mv helmfile /usr/local/bin/
           helmfile --version
 
       - name: Install helm diff plugin
@@ -60,7 +60,7 @@ jobs:
       - name: Deploy with Helmfile
         run: |
           cd helmfiles/app/stakefish
-          helmfile apply --selector name=stakefish
+          sudo helmfile apply --selector name=stakefish
         env:
           KUBECONFIG: ${{ steps.set-context.outputs.kubeconfig }}
 
