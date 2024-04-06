@@ -43,6 +43,9 @@ jobs:
           sudo mv helmfile /usr/local/bin/
           helmfile --version
 
+      - name: Install helm diff plugin
+        run: helm plugin install https://github.com/databus23/helm-diff
+
       - name: Deploy with Helmfile
         run: |
           cd helmfiles/app/stakefish
