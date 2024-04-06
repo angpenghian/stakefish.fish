@@ -50,7 +50,7 @@ jobs:
           helmfile --version
 
       - name: Install helm diff plugin
-        run: helm plugin install https://github.com/databus23/helm-diff
+        run: sudo helm plugin install https://github.com/databus23/helm-diff
 
       - name: Test kubectl configuration
         run: |
