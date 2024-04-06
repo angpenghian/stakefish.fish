@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source code 
         uses: actions/checkout@v4
@@ -53,6 +53,9 @@ jobs:
         env:
           KUBECONFIG: ${{ steps.set-context.outputs.kubeconfig }}
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
       - name: Test application
         run: |
           set -e # Stop the workflow if any command fails
