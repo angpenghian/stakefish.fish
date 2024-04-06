@@ -18,8 +18,8 @@ jobs:
 
       - name: Build and push Docker image to ACR
         run: |
-          docker build -t ${{ secrets.registry }}.azurecr.io/${{ secrets.repository }}/fastapi-test:latest -f docker/Dockerfile docker
-          docker push ${{ secrets.registry }}.azurecr.io/${{ secrets.repository }}/fastapi-test:latest
+          sudo docker build -t ${{ secrets.registry }}.azurecr.io/${{ secrets.repository }}/fastapi-test:latest -f docker/Dockerfile docker
+          sudo docker push ${{ secrets.registry }}.azurecr.io/${{ secrets.repository }}/fastapi-test:latest
 
       - name: Azure login
         id: login
