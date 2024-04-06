@@ -19,7 +19,7 @@ jobs:
           tenant: ${{ secrets.tenant }}
           registry: ${{ secrets.registry }}
           repository: ${{ secrets.repository }}
-          image:  fastapi-test
+          image:  stakefish
           dockerfile: docker/Dockerfile
           folder: docker
           branch: main
