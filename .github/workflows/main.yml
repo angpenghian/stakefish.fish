@@ -14,7 +14,8 @@ jobs:
 
       - name: Build and push Docker image to ACR
         run: |
-          docker build -t penghian.azurecr.io/fastapi-test:latest -f -f docker/Dockerfile ./docker
+          docker build -t fastapi-test:latest -f docker/Dockerfile ./docker
+          docker tag fastapi-test:latest penghian.azurecr.io/fastapi-test:latest
           docker push penghian.azurecr.io/fastapi-test:latest
 
     # runs-on: ubuntu-latest
