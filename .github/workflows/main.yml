@@ -41,6 +41,15 @@ jobs:
         id: install-kubectl
         uses: azure/setup-kubectl@v3
 
+      - name: Install Helm
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+
+      - name: Install helm diff plugin
+        run: helm plugin install https://github.com/databus23/helm-diff
+
       - name: Install helmfile
         run: |
           curl -L https://github.com/helmfile/helmfile/releases/download/v0.163.1/helmfile_0.163.1_linux_amd64.tar.gz -o helmfile.tar.gz
@@ -48,9 +57,6 @@ jobs:
           chmod +x helmfile
           sudo mv helmfile /usr/local/bin/
           helmfile --version
-
-      - name: Install helm diff plugin
-        run: sudo helm plugin install https://github.com/databus23/helm-diff
 
       - name: Test kubectl configuration
         run: |
