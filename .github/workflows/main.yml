@@ -22,7 +22,7 @@ jobs:
           image:  fastapi-test
           folder: docker
           branch: main
-          tag: ${{ github.sha }}
+          tag: latest
 
       - name: Azure login
         id: login
