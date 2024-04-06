@@ -9,20 +9,6 @@ jobs:
       - name: Checkout source code 
         uses: actions/checkout@v4
 
-      # - name: ACR build
-      #   id: acr
-      #   uses: azure/acr-build@v1
-      #   with:
-      #     service_principal: ${{ secrets.service_principal }}
-      #     service_principal_password: ${{ secrets.service_principal_password }}
-      #     tenant: ${{ secrets.tenant }}
-      #     registry: penghian
-      #     repository: fastapi-test
-      #     image: image
-      #     folder: docker
-      #     dockerfile: docker/Dockerfile
-      #     branch: main
-
       - name: Log in to Azure Container Registry
         run: sudo docker login penghian.azurecr.io --username ${{ secrets.ACR_USERNAME }} --password ${{ secrets.ACR_PASSWORD }}
 
@@ -45,6 +31,11 @@ jobs:
           resource-group: '${{ secrets.resource_group }}' 
           cluster-name: '${{ secrets.cluster_name }}'
 
+      - name: Test kubectl configuration
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
       - name: Setup kubectl
         id: install-kubectl
         uses: azure/setup-kubectl@v3
@@ -54,7 +45,7 @@ jobs:
           curl -L https://github.com/helmfile/helmfile/releases/download/v0.163.1/helmfile_0.163.1_linux_amd64.tar.gz -o helmfile.tar.gz
           tar -zxvf helmfile.tar.gz
           chmod +x helmfile
-          sudo mv helmfile /usr/local/bin/
+          mv helmfile /usr/local/bin/
           helmfile --version
 
       - name: Install helm diff plugin
