@@ -1,0 +1,54 @@
+name: build_deploy_aks
+on:
+  push:
+    paths:
+      - "docker/**"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code 
+        uses: actions/checkout@v3
+
+      - name: ACR build
+        id: build-push-acr
+        uses: azure/acr-build@v1
+        with:
+          service_principal: ${{ secrets.service_principal }}
+          service_principal_password: ${{ secrets.service_principal_password }}
+          tenant: ${{ secrets.tenant }}
+          registry: ${{ secrets.registry }}
+          repository: ${{ secrets.repository }}
+          image:  fastapi-test
+          folder: docker
+          branch: main
+          tag: ${{ github.sha }}
+
+      - name: Azure login
+        id: login
+        uses: azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS context
+        id: set-context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: '${{ secrets.resource_group }}' 
+          cluster-name: '${{ secrets.cluster_name }}'
+
+      - name: Setup kubectl
+        id: install-kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Install helmfile
+        run: |
+          curl -L --output helmfile https://github.com/roboll/helmfile/releases/download/v0.139.9/helmfile_linux_amd64
+          chmod +x helmfile
+          sudo mv helmfile /usr/local/bin
+
+      - name: Deploy with Helmfile
+        run: |
+          helmfile -f ./helmfiles/app/stakefish apply --selector name=stakefish
+        env:
+          KUBECONFIG: ${{ steps.set-context.outputs.kubeconfig }}
