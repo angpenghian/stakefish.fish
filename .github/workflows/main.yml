@@ -1,8 +1,7 @@
 name: build_deploy_aks
 on:
   push:
-    paths:
-      - "docker"
+
 jobs:
   build:
     runs-on: ubuntu-latest
