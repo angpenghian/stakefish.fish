@@ -78,7 +78,7 @@ jobs:
       - name: Deploy with Helmfile
         run: |
           cd helmfiles/app/stakefish
-          helmfile apply --selector name=prometheus
+          helmfile apply --selector name=stakefish
         env:
           KUBECONFIG: ${{ steps.set-context.outputs.kubeconfig }}
 
