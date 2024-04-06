@@ -2,7 +2,7 @@ name: build_deploy_aks
 on:
   push:
     paths:
-      - "docker/**"
+      - "docker"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,6 +20,7 @@ jobs:
           registry: ${{ secrets.registry }}
           repository: ${{ secrets.repository }}
           image:  fastapi-test
+          dockerfile: docker/Dockerfile
           folder: docker
           branch: main
           tag: latest
