@@ -66,7 +66,7 @@ jobs:
       - name: Deploy with Helmfile
         run: |
           cd helmfiles/app/stakefish
-          sudo helmfile apply --selector name=stakefish
+          helmfile apply --selector name=stakefish
         env:
           KUBECONFIG: ${{ steps.set-context.outputs.kubeconfig }}
 
