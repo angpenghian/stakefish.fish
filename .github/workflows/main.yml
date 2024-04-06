@@ -4,8 +4,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    # runs-on: [self-hosted, linux]
+    # runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     steps:
       - name: Checkout source code 
         uses: actions/checkout@v4
@@ -54,6 +54,16 @@ jobs:
           chmod +x helmfile
           sudo mv helmfile /usr/local/bin/
           helmfile --version
+
+      - name: Cleanup Helm Diff Plugin (if exists)
+        run: |
+          HELM_PLUGIN_DIR=$(helm env | grep HELM_PLUGINS | cut -d'=' -f2 | tr -d '"')
+          if [ -d "${HELM_PLUGIN_DIR}/helm-diff" ]; then
+            echo "Helm Diff plugin directory exists, deleting..."
+            rm -rf "${HELM_PLUGIN_DIR}/helm-diff"
+          else
+            echo "Helm Diff plugin directory does not exist, proceeding..."
+          fi
 
       - name: Install helm diff plugin
         run: helm plugin install https://github.com/databus23/helm-diff
