@@ -51,6 +51,11 @@ jobs:
       - name: Install helm diff plugin
         run: helm plugin install https://github.com/databus23/helm-diff
 
+      - name: Test kubectl configuration
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
       - name: Deploy with Helmfile
         run: |
           cd helmfiles/app/stakefish
