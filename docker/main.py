@@ -22,7 +22,7 @@ dns_logs = sqlalchemy.Table(
 )
 
 # Azure Database for MySQL connection details
-DATABASE_URL = os.getenv("DATABASE_URL", "a")
+DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 # Initialize the Database object
 database = Database(DATABASE_URL)
