@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: ACR build
         id: build-push-acr
@@ -52,3 +52,24 @@ jobs:
           helmfile -f ./helmfiles/app/stakefish apply --selector name=stakefish
         env:
           KUBECONFIG: ${{ steps.set-context.outputs.kubeconfig }}
+
+      - name: Test application
+        run: |
+          set -e # Stop the workflow if any command fails
+          echo "Testing root path..."
+          curl http://172.171.140.70:3000/
+          
+          echo "Testing lookup endpoint..."
+          curl "http://172.171.140.70:3000/v1/tools/lookup?domain=example.com"
+          
+          echo "Testing history endpoint..."
+          curl http://172.171.140.70:3000/v1/history
+          
+          echo "Testing validate endpoint with POST request..."
+          curl -X 'POST' \
+            'http://172.171.140.70:3000/v1/tools/validate' \
+            -H 'accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "ip": "192.168.1.1"
+            }'
