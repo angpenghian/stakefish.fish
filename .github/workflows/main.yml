@@ -4,62 +4,59 @@ on:
 
 jobs:
   build:
-    # runs-on: ubuntu-latest
     runs-on: [self-hosted, linux]
     steps:
-      - name: Checkout source code 
+      - name: Checkout source code
         uses: actions/checkout@v4
 
       - name: Log in to Azure Container Registry
-        run: sudo docker login penghian.azurecr.io --username ${{ secrets.ACR_USERNAME }} --password ${{ secrets.ACR_PASSWORD }}
+        uses: docker/login-action@v1
+        with:
+          registry: penghian.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-buildx-
 
       - name: Build and push Docker image to ACR
-        run: |
-          sudo docker build -t fastapi-test:latest -f docker/Dockerfile ./docker
-          sudo docker tag fastapi-test:latest penghian.azurecr.io/fastapi-test:latest
-          sudo docker push penghian.azurecr.io/fastapi-test:latest
+        uses: docker/build-push-action@v2
+        with:
+          context: ./docker
+          file: ./docker/Dockerfile
+          push: true
+          tags: penghian.azurecr.io/fastapi-test:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
 
       - name: Azure CLI login
-        run: |
-          az login --service-principal -u ${{ secrets.AZURE_APP_ID }} -p ${{ secrets.AZURE_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-          az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Set AKS context using Azure CLI
-        run: |
-          az aks get-credentials --resource-group penghian_rg --name penghian --overwrite-existing
-
-      - name: Test kubectl configuration
-        run: |
-          kubectl cluster-info
-          kubectl get nodes
+        run: az aks get-credentials --resource-group penghian_rg --name penghian --overwrite-existing
 
       - name: Setup kubectl
-        id: install-kubectl
         uses: azure/setup-kubectl@v3
 
       - name: Install Helm
-        run: |
-          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-          chmod 700 get_helm.sh
-          ./get_helm.sh
+        uses: azure/setup-helm@v1
 
       - name: Install helmfile
         run: |
-          curl -L https://github.com/helmfile/helmfile/releases/download/v0.163.1/helmfile_0.163.1_linux_amd64.tar.gz -o helmfile.tar.gz
+          curl -L "https://github.com/helmfile/helmfile/releases/download/v0.163.1/helmfile_0.163.1_linux_amd64.tar.gz" -o helmfile.tar.gz
           tar -zxvf helmfile.tar.gz
           chmod +x helmfile
           sudo mv helmfile /usr/local/bin/
           helmfile --version
-
-      - name: Cleanup Helm Diff Plugin (if exists)
-        run: |
-          HELM_PLUGIN_DIR=$(helm env | grep HELM_PLUGINS | cut -d'=' -f2 | tr -d '"')
-          if [ -d "${HELM_PLUGIN_DIR}/helm-diff" ]; then
-            echo "Helm Diff plugin directory exists, deleting..."
-            rm -rf "${HELM_PLUGIN_DIR}/helm-diff"
-          else
-            echo "Helm Diff plugin directory does not exist, proceeding..."
-          fi
 
       - name: Install helm diff plugin
         run: helm plugin install https://github.com/databus23/helm-diff
@@ -67,9 +64,7 @@ jobs:
       - name: Deploy with Helmfile
         run: |
           cd helmfiles/app/stakefish
-          helmfile apply --selector name=stakefish
-        env:
-          KUBECONFIG: ${{ steps.set-context.outputs.kubeconfig }}
+          helmfile apply --selector name=prometheus
 
       - name: Test application
         run: |
