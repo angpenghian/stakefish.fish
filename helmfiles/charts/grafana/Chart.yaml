@@ -1,5 +1,0 @@
-# Chart.yaml
-apiVersion: v2
-name: grafana
-description: A Helm chart for grafana
-version: 1.0.0

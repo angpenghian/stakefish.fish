@@ -27,7 +27,7 @@ spec:
           - "--reload"
         env:
           - name: DATABASE_URL
-            value: "{{ .Values.fastapi.db_url }}"
+            value: "{{ .Values.db_url }}"
         ports:
         - name: fastapi-port
           containerPort: {{ .Values.service.port }}
@@ -36,9 +36,11 @@ spec:
           {{- toYaml .Values.resources | nindent 12 }}
         {{- end }}
         volumeMounts:
-        - name: config-volume
-          mountPath: /etc/config
+        - name: azure-ca-pem-volume
+          mountPath: /etc/ssl/certs/azure_ca.pem
+          subPath: azure_ca.pem
+          readOnly: true
       volumes:
-      - name: config-volume
-        configMap:
-          name: {{ .Release.Name }}-configmap
+      - name: azure-ca-pem-volume
+        secret:
+          secretName: azure-ca-pem

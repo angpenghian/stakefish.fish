@@ -76,9 +76,9 @@ service:
   type: LoadBalancer
   port: 3000
 
-fastapi:
-  db_url: |-
-    a
-  key: |-
-    -----BEGIN CERTIFICATE-----
-    -----END CERTIFICATE-----
+db_url: |-
+  mysql://angpenghian:this-is-sen-setive/penghian?ssl=true&ssl_ca=/etc/ssl/certs/azure_ca.pem
+azure-ca-pem: |-
+  -----BEGIN CERTIFICATE-----
+
+  -----END CERTIFICATE-----

@@ -7,6 +7,7 @@ import socket
 from databases import Database
 import sqlalchemy
 import httpx
+from starlette_prometheus import PrometheusMiddleware, metrics
 
 app = FastAPI()
 
@@ -55,6 +56,15 @@ def is_running_in_kubernetes() -> bool:
     This is determined by checking the existence of a service account token.
     """
     return os.path.exists("/var/run/secrets/kubernetes.io/serviceaccount/token")
+
+# Add Prometheus middleware to the application
+app.add_middleware(PrometheusMiddleware)
+# Expose metrics endpoint for Prometheus
+app.add_route("/metrics", metrics)
+
+@app.get("/health")
+async def health_check():
+    return "ok"
 
 @app.get("/", tags=["root"])
 def read_root():
